@@ -1,0 +1,15 @@
+{
+  "name": "solana-pinocchio-starter",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test:devnet": "node --loader ts-node/esm tests/devnet-deploy-tests.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
