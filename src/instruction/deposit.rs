@@ -8,7 +8,6 @@ use pinocchio::{
 };
 use pinocchio_system::instructions::{CreateAccount, Transfer};
 use pinocchio_log::log;
-//pub const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
 
 use crate::{
     error::MyProgramError,
@@ -30,26 +29,26 @@ impl DataLen for DepositIxData {
 pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     // checks for accounts
     log!("Starting deposit process");
-    let [deposit_acc, vault_acc, state_acc, _sysvar_rent_acc, _system_program] = accounts else {
-        log!("Error: Not enough account keys");
-        return Err(ProgramError::NotEnoughAccountKeys);
+    let [deposit_acc,
+         vault_acc, 
+         state_acc, 
+         _sysvar_rent_acc, 
+         _system_program] = accounts 
+        else {
+            return Err(ProgramError::NotEnoughAccountKeys);
     };
 
     if !deposit_acc.is_signer() {
-        log!("Error: Deposit account is not a signer");
         return Err(ProgramError::MissingRequiredSignature);
     }
 
     if !vault_acc.data_is_empty() && unsafe {!vault_acc.owner().eq(&crate::ID) } {
-        log!("Error: Invalid vault account");
         return Err(MyProgramError::InvalidAccount.into());
     }
 
     let ix_data = match load_ix_data::<DepositIxData>(data) {
         Ok(data) => data,
         Err(_) => {
-            log!("Error loading instruction data");
-            log!("Instruction data length: {}", data.len());
             return Err(ProgramError::InvalidInstructionData);
         }
     };
@@ -59,7 +58,6 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     let rent = match Rent::get() {
         Ok(rent) => rent,
         Err(_) => {
-            log!("Error getting rent");
             return Err(ProgramError::AccountNotRentExempt);
         }
     };
@@ -90,7 +88,6 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         VaultState::initialize(state_acc, ix_data.vault_bump, ix_data.state_bump)?;
         log!("State account initialized");
     } else if unsafe { !state_acc.owner().eq(&crate::ID) } {
-        log!("Error: State account already initialized by another program");
         return Err(ProgramError::AccountAlreadyInitialized);
     }
 
@@ -104,13 +101,11 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     ) {
         Ok(pda) => pda,
         Err(_) => {
-            log!("Error creating program address");
             return Err(ProgramError::InvalidSeeds);
         }
     };
 
     if vault_acc.key() != &vault_pda {
-        log!("Error: Invalid vault account");
         return Err(ProgramError::InvalidAccountData);
     }
     // log the amount deposited

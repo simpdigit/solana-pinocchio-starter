@@ -53,7 +53,7 @@ This project uses Mollusk SVM for testing. You can add or modify tests in the `t
 
 4. Deploy using the Solana CLI:
 
-    `solana-keygen -o program-keypair.json`
+    `solana-keygen new -o program-keypair.json`
     
     `solana program deploy target/deploy/solana_pinocchio_starter.so --program-id program-keypair.json`
 
